@@ -64,7 +64,7 @@ def get_weather(region):
 def get_birthday(birthday, year, today):
     birthday_year = birthday.split("-")[0]
     # 判断是否为农历生日
-    if birthday_year[0] == "r":
+    if "r" in birthday_year[0]:
         r_mouth = int(birthday.split("-")[1])
         r_day = int(birthday.split("-")[2])
         # 获取农历生日的今年对应的月和日
@@ -87,7 +87,7 @@ def get_birthday(birthday, year, today):
         year_date = date(year, birthday_month, birthday_day)
     # 计算生日年份，如果还没过，按当年减，如果过了需要+1
     if today > year_date:
-        if birthday_year[0] == "r":
+        if "r" in birthday_year[0]:
             # 获取农历明年生日的月和日
             r_last_birthday = ZhDate((year + 1), r_mouth, r_day).to_datetime().date()
             birth_date = date((year + 1), r_last_birthday.month, r_last_birthday.day)
