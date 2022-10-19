@@ -161,7 +161,7 @@ def get_ciba():
     return note_ch, note_en
 
 
-def send_message(to_user, access_token, region_name, weather, temp, wind_dir, weather1, temp1, wind_dir1, weather2,
+def send_message(to_user, access_token, region_name,region_name1,region_name2, weather, temp, wind_dir, weather1, temp1, wind_dir1, weather2,
                  temp2, wind_dir2, note_ch, note_en):
     url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(access_token)
     week_list = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"]
@@ -194,6 +194,14 @@ def send_message(to_user, access_token, region_name, weather, temp, wind_dir, we
             },
             "region": {
                 "value": region_name,
+                "color": get_color()
+            },
+            "region1": {
+                "value": region_name1,
+                "color": get_color()
+            },
+            "region2": {
+                "value": region_name2,
                 "color": get_color()
             },
             "weather": {
@@ -303,6 +311,6 @@ if __name__ == "__main__":
         note_ch, note_en = get_ciba()
     # 公众号推送消息
     for user in users:
-        send_message(user, accessToken, region, weather, temp, wind_dir, weather1, temp1, wind_dir1, weather2, temp2,
+        send_message(user, accessToken, region,region1,region2, weather, temp, wind_dir, weather1, temp1, wind_dir1, weather2, temp2,
                      wind_dir2, note_ch, note_en)
     os.system("pause")
