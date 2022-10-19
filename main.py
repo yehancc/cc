@@ -31,14 +31,18 @@ def get_access_token():
     return access_token
  
  
-def get_weather(region):
+def get_weather(region,region1,region2):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
                       'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
     }
     key = config["weather_key"]
     region_url = "https://geoapi.qweather.com/v2/city/lookup?location={}&key={}".format(region, key)
+    region_url1 = "https://geoapi.qweather.com/v2/city/lookup?location={}&key={}".format(region1, key)
+    region_url2 = "https://geoapi.qweather.com/v2/city/lookup?location={}&key={}".format(region2, key)
     response = get(region_url, headers=headers).json()
+    response1 = get(region_url1, headers=headers).json()
+    response2 = get(region_url2, headers=headers).json()
     if response["code"] == "404":
         print("推送消息失败，请检查地区名是否有误！")
         os.system("pause")
@@ -50,15 +54,59 @@ def get_weather(region):
     else:
         # 获取地区的location--id
         location_id = response["location"][0]["id"]
+       
+       
+    if response1["code"] == "404":
+        print("推送消息失败，请检查地区名是否有误！")
+        os.system("pause")
+        sys.exit(1)
+    elif response1["code"] == "401":
+        print("推送消息失败，请检查和风天气key是否正确！")
+        os.system("pause")
+        sys.exit(1)
+    else:
+        # 获取地区的location--id
+        location_id1 = response1["location"][0]["id"]
+       
+       
+    if response2["code"] == "404":
+        print("推送消息失败，请检查地区名是否有误！")
+        os.system("pause")
+        sys.exit(1)
+    elif response2["code"] == "401":
+        print("推送消息失败，请检查和风天气key是否正确！")
+        os.system("pause")
+        sys.exit(1)
+    else:
+        # 获取地区的location--id
+        location_id = response2["location"][0]["id"]
     weather_url = "https://devapi.qweather.com/v7/weather/now?location={}&key={}".format(location_id, key)
+    weather_url1 = "https://devapi.qweather.com/v7/weather/now?location={}&key={}".format(location_id1, key)
+    weather_url2 = "https://devapi.qweather.com/v7/weather/now?location={}&key={}".format(location_id2, key)
     response = get(weather_url, headers=headers).json()
+    response1 = get(weather_url1, headers=headers).json()
+    response2 = get(weather_url2, headers=headers).json()
     # 天气
     weather = response["now"]["text"]
     # 当前温度
     temp = response["now"]["temp"] + u"\N{DEGREE SIGN}" + "C"
     # 风向
     wind_dir = response["now"]["windDir"]
-    return weather, temp, wind_dir
+    
+    # 天气
+    weather1 = response1["now"]["text"]
+    # 当前温度
+    temp1 = response1["now"]["temp"] + u"\N{DEGREE SIGN}" + "C"
+    # 风向
+    wind_dir1 = response1["now"]["windDir"]
+    
+    # 天气
+    weather2 = response2["now"]["text"]
+    # 当前温度
+    temp2 = response2["now"]["temp"] + u"\N{DEGREE SIGN}" + "C"
+    # 风向
+    wind_dir2 = response2["now"]["windDir"]
+    return weather, temp, wind_dir,weather1, temp1, wind_dir1,weather2, temp2, wind_dir2
  
  
 def get_birthday(birthday, year, today):
@@ -115,7 +163,7 @@ def get_ciba():
     return note_ch, note_en
  
  
-def send_message(to_user, access_token, region_name, weather, temp, wind_dir, note_ch, note_en):
+def send_message(to_user, access_token, region_name, weather, temp, wind_dir,weather1, temp1, wind_dir1,weather2, temp2, wind_dir2, note_ch, note_en):
     url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(access_token)
     week_list = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"]
     year = localtime().tm_year
@@ -159,6 +207,30 @@ def send_message(to_user, access_token, region_name, weather, temp, wind_dir, no
             },
             "wind_dir": {
                 "value": wind_dir,
+                "color": get_color()
+            },
+         "weather1": {
+                "value": weather1,
+                "color": get_color()
+            },
+            "temp1": {
+                "value": temp1,
+                "color": get_color()
+            },
+            "wind_dir1": {
+                "value": wind_dir1,
+                "color": get_color()
+            },
+         "weather2": {
+                "value": weather2,
+                "color": get_color()
+            },
+            "temp2": {
+                "value": temp2,
+                "color": get_color()
+            },
+            "wind_dir2": {
+                "value": wind_dir2,
                 "color": get_color()
             },
             "love_day": {
@@ -221,7 +293,9 @@ if __name__ == "__main__":
     users = config["user"]
     # 传入地区获取天气信息
     region = config["region"]
-    weather, temp, wind_dir = get_weather(region)
+    region1 = config["region1"]
+    region2 = config["region2"]
+    weather, temp, wind_dir,weather1, temp1, wind_dir1,weather2, temp2, wind_dir2 = get_weather(region,region1,region2)
     note_ch = config["note_ch"]
     note_en = config["note_en"]
     if note_ch == "" and note_en == "":
@@ -229,5 +303,5 @@ if __name__ == "__main__":
         note_ch, note_en = get_ciba()
     # 公众号推送消息
     for user in users:
-        send_message(user, accessToken, region, weather, temp, wind_dir, note_ch, note_en)
+        send_message(user, accessToken, region,weather, temp, wind_dir,weather1, temp1, wind_dir1,weather2, temp2, wind_dir2, note_ch, note_en)
     os.system("pause")
