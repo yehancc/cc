@@ -240,10 +240,6 @@ def send_message(to_user, access_token, region_name,region_name1,region_name2, w
                 "value": wind_dir2,
                 "color": get_color()
             },
-            "love_day": {
-                "value": love_days,
-                "color": get_color()
-            },
             "note_en": {
                 "value": note_en,
                 "color": get_color()
